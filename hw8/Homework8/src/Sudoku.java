@@ -93,6 +93,8 @@ public class Sudoku
       columns = new Hashtable<Integer, ArrayList<Entry>>();
       grids = new Hashtable<Integer, ArrayList<Entry>>();
       unsetEntries = new ArrayList<Entry>();
+      
+      // Assuming it is a 9x9 matrix... can throw exceptions
       for (int i = 0; i < 9; i++)
       {
         for (int j = 0; j < 9; j++)
