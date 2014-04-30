@@ -114,10 +114,12 @@ public class Sudoku
     public void solve()
     {
       int row, column, grid;
+      int lastSize = 0;
       ArrayList<Entry> finishedEntries = new ArrayList<Entry>();
 
-      while (unsetEntries.size() > 0)
+      while (unsetEntries.size() > 0 && unsetEntries.size() != lastSize)
       {
+        lastSize = unsetEntries.size();
         for (Entry entry : unsetEntries)
         {
           row = entry.row;
@@ -156,6 +158,12 @@ public class Sudoku
         {
           unsetEntries.remove(entry);
         }
+      }
+
+      if (unsetEntries.size() != 0)
+      {
+        System.out.println("The Sudoku puzzle is not unique. There are multiple answers.");
+        System.out.println();
       }
 
       if (!validSums())
