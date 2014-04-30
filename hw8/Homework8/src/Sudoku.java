@@ -93,7 +93,7 @@ public class Sudoku
       columns = new Hashtable<Integer, ArrayList<Entry>>();
       grids = new Hashtable<Integer, ArrayList<Entry>>();
       unsetEntries = new ArrayList<Entry>();
-      
+
       // Assuming it is a 9x9 matrix... can throw exceptions
       for (int i = 0; i < 9; i++)
       {
@@ -116,49 +116,49 @@ public class Sudoku
       int row, column, grid;
       ArrayList<Entry> finishedEntries = new ArrayList<Entry>();
 
-      for (Entry entry : unsetEntries)
+      while (unsetEntries.size() > 0)
       {
-        row = entry.row;
-        column = entry.column;
-        grid = entry.grid;
-
-        if (!entry.isSet())
+        for (Entry entry : unsetEntries)
         {
-          for (Entry e : rows.get(row))
-          {
-            entry.possibleValues.remove((Integer) e.value);
-          }
-          for (Entry e : columns.get(column))
-          {
-            entry.possibleValues.remove((Integer) e.value);
-          }
-          for (Entry e : grids.get(grid))
-          {
-            entry.possibleValues.remove((Integer) e.value);
-          }
+          row = entry.row;
+          column = entry.column;
+          grid = entry.grid;
 
-          if (entry.possibleValues.size() == 1)
+          if (!entry.isSet())
           {
-            rows.get(row).set(rows.get(row).indexOf(entry),
-                new Entry(entry.row, entry.column, entry.possibleValues.get(0)));
-            columns.get(column).set(columns.get(column).indexOf(entry),
-                new Entry(entry.row, entry.column, entry.possibleValues.get(0)));
-            grids.get(grid).set(grids.get(grid).indexOf(entry),
-                new Entry(entry.row, entry.column, entry.possibleValues.get(0)));
-            finishedEntries.add(entry);
+            for (Entry e : rows.get(row))
+            {
+              entry.possibleValues.remove((Integer) e.value);
+            }
+            for (Entry e : columns.get(column))
+            {
+              entry.possibleValues.remove((Integer) e.value);
+            }
+            for (Entry e : grids.get(grid))
+            {
+              entry.possibleValues.remove((Integer) e.value);
+            }
+
+            if (entry.possibleValues.size() == 1)
+            {
+              rows.get(row).set(rows.get(row).indexOf(entry),
+                  new Entry(entry.row, entry.column, entry.possibleValues.get(0)));
+              columns.get(column).set(columns.get(column).indexOf(entry),
+                  new Entry(entry.row, entry.column, entry.possibleValues.get(0)));
+              grids.get(grid).set(grids.get(grid).indexOf(entry),
+                  new Entry(entry.row, entry.column, entry.possibleValues.get(0)));
+              finishedEntries.add(entry);
+            }
           }
+        }
+
+        for (Entry entry : finishedEntries)
+        {
+          unsetEntries.remove(entry);
         }
       }
 
-      for (Entry entry : finishedEntries)
-      {
-        unsetEntries.remove(entry);
-      }
-
-      if (unsetEntries.size() > 0)
-      {
-        solve();
-      } else if (!validSums())
+      if (!validSums())
       {
         System.out.println("An error occurred during the calculations. The sums are incorrect.");
         System.out.println();
