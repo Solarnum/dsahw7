@@ -10,7 +10,7 @@ public class Sudoku
   private static class Entry
   {
     public int row, column, grid, value;
-    public List<Integer> possibleValues;
+    public ArrayList<Integer> possibleValues;
 
     public Entry(int row, int column, int value)
     {
@@ -117,8 +117,65 @@ public class Sudoku
       int lastSize = 0;
       ArrayList<Entry> finishedEntries = new ArrayList<Entry>();
 
-      while (unsetEntries.size() > 0 && unsetEntries.size() != lastSize)
+      while (unsetEntries.size() > 0)
       {
+        if (unsetEntries.size() == lastSize)
+        {
+          for (Entry entry : unsetEntries)
+          {
+            row = entry.row;
+            column = entry.column;
+            ArrayList<Integer> uniqueValues = new ArrayList<Integer>(entry.possibleValues);
+            ArrayList<Integer> nonUnique = new ArrayList<Integer>();
+            grid = entry.grid;
+
+            for (Entry e : grids.get(grid))
+            {
+              if (!entry.equals(e))
+              {
+                for (Integer i : uniqueValues)
+                {
+                  if (e.possibleValues.contains((Integer) i))
+                  {
+                    nonUnique.add(i);
+                  }
+                }
+              }
+            }
+
+            for (Integer i : nonUnique)
+            {
+              uniqueValues.remove((Integer) i);
+            }
+
+            //            System.out.print("(" + row + "," + column + ") : ");
+            //            for (Integer i : uniqueValues)
+            //            {
+            //              System.out.print(i + ", ");
+            //            }
+            //            System.out.println();
+
+            if (uniqueValues.size() == 1)
+            {
+              rows.get(row).set(rows.get(row).indexOf(entry),
+                  new Entry(entry.row, entry.column, uniqueValues.get(0)));
+              columns.get(column).set(columns.get(column).indexOf(entry),
+                  new Entry(entry.row, entry.column, uniqueValues.get(0)));
+              grids.get(grid).set(grids.get(grid).indexOf(entry),
+                  new Entry(entry.row, entry.column, uniqueValues.get(0)));
+              finishedEntries.add(entry);
+            }
+          }
+
+          for (Entry entry : finishedEntries)
+          {
+            unsetEntries.remove(entry);
+          }
+
+          if (unsetEntries.size() == lastSize)
+            break;
+        }
+
         lastSize = unsetEntries.size();
         for (Entry entry : unsetEntries)
         {
