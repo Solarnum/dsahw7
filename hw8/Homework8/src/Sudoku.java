@@ -316,7 +316,7 @@ public class Sudoku
       }
     }
 
-    public void tupleRule()
+    public void gridTupleRule()
     {
       int row, column, grid;
       ArrayList<Entry> finishedEntries = new ArrayList<Entry>();
@@ -388,7 +388,153 @@ public class Sudoku
         unsetEntries.remove(entry);
       }
     }
+    
+    public void rowTupleRule()
+    {
+      int row, column, grid;
+      ArrayList<Entry> finishedEntries = new ArrayList<Entry>();
+      ArrayList<Entry> tupleEntries = new ArrayList<Entry>();
+      Hashtable<Integer, ArrayList<Entry>> tupleCandidates;
 
+      for (row = 0; row < rows.size(); row++)
+      {
+        tupleCandidates = new Hashtable<Integer, ArrayList<Entry>>();
+
+        // Check each cell in the grid to find the digits that are present in
+        // exactly 2 cells
+        for (int i = 1; i <= 9; i++)
+        {
+          ArrayList<Entry> list = new ArrayList<Entry>();
+          for (Entry entry : rows.get(row))
+          {
+            if (entry.possibleValues.contains(i))
+            {
+              list.add(entry);
+            }
+          }
+
+          if (list.size() == 2)
+          {
+            tupleCandidates.put(i, list);
+          }
+        }
+
+        // Find the ywo tuple lists that are the same those two entries 
+        // can have the rest of their possible values remove
+        for (Integer i : tupleCandidates.keySet())
+        {
+          for (Integer i2 : tupleCandidates.keySet())
+          {
+            if (i != i2)
+            {
+              // There will always be two entries in each list
+              if (tupleCandidates.get(i).contains(tupleCandidates.get(i2).get(0))
+                  && tupleCandidates.get(i).contains(tupleCandidates.get(i2).get(1)))
+              {
+                Entry e1 = tupleCandidates.get(i).get(0);
+                Entry e2 = tupleCandidates.get(i).get(1);
+                ArrayList<Integer> tupleValues = new ArrayList<Integer>();
+                tupleValues.add(i);
+                tupleValues.add(i2);
+                e1.possibleValues = tupleValues;
+                e2.possibleValues = tupleValues;
+
+                //e1.print();
+                //e2.print();
+                //System.out.println();
+
+                rows.get(e1.row).set(rows.get(e1.row).indexOf(e1), e1);
+                columns.get(e1.column).set(columns.get(e1.column).indexOf(e1), e1);
+                grids.get(e1.grid).set(grids.get(e1.grid).indexOf(e1), e1);
+
+                rows.get(e2.row).set(rows.get(e2.row).indexOf(e2), e2);
+                columns.get(e2.column).set(columns.get(e2.column).indexOf(e2), e2);
+                grids.get(e2.grid).set(grids.get(e2.grid).indexOf(e2), e2);
+              }
+            }
+          }
+        }
+      }
+
+      for (Entry entry : finishedEntries)
+      {
+        unsetEntries.remove(entry);
+      }
+    }
+
+    public void columnTupleRule()
+    {
+      int row, column, grid;
+      ArrayList<Entry> finishedEntries = new ArrayList<Entry>();
+      ArrayList<Entry> tupleEntries = new ArrayList<Entry>();
+      Hashtable<Integer, ArrayList<Entry>> tupleCandidates;
+
+      for (column = 0; column < columns.size(); column++)
+      {
+        tupleCandidates = new Hashtable<Integer, ArrayList<Entry>>();
+
+        // Check each cell in the grid to find the digits that are present in
+        // exactly 2 cells
+        for (int i = 1; i <= 9; i++)
+        {
+          ArrayList<Entry> list = new ArrayList<Entry>();
+          for (Entry entry : columns.get(column))
+          {
+            if (entry.possibleValues.contains(i))
+            {
+              list.add(entry);
+            }
+          }
+
+          if (list.size() == 2)
+          {
+            tupleCandidates.put(i, list);
+          }
+        }
+
+        // Find the ywo tuple lists that are the same those two entries 
+        // can have the rest of their possible values remove
+        for (Integer i : tupleCandidates.keySet())
+        {
+          for (Integer i2 : tupleCandidates.keySet())
+          {
+            if (i != i2)
+            {
+              // There will always be two entries in each list
+              if (tupleCandidates.get(i).contains(tupleCandidates.get(i2).get(0))
+                  && tupleCandidates.get(i).contains(tupleCandidates.get(i2).get(1)))
+              {
+                Entry e1 = tupleCandidates.get(i).get(0);
+                Entry e2 = tupleCandidates.get(i).get(1);
+                ArrayList<Integer> tupleValues = new ArrayList<Integer>();
+                tupleValues.add(i);
+                tupleValues.add(i2);
+                e1.possibleValues = tupleValues;
+                e2.possibleValues = tupleValues;
+
+                //e1.print();
+                //e2.print();
+                //System.out.println();
+
+                rows.get(e1.row).set(rows.get(e1.row).indexOf(e1), e1);
+                columns.get(e1.column).set(columns.get(e1.column).indexOf(e1), e1);
+                grids.get(e1.grid).set(grids.get(e1.grid).indexOf(e1), e1);
+
+                rows.get(e2.row).set(rows.get(e2.row).indexOf(e2), e2);
+                columns.get(e2.column).set(columns.get(e2.column).indexOf(e2), e2);
+                grids.get(e2.grid).set(grids.get(e2.grid).indexOf(e2), e2);
+              }
+            }
+          }
+        }
+      }
+
+      for (Entry entry : finishedEntries)
+      {
+        unsetEntries.remove(entry);
+      }
+    }
+    
     public void uniqueDigitRule()
     {
       int row, column, grid;
@@ -490,17 +636,19 @@ public class Sudoku
         gridCellRule();
         rowCellRule();
         columnCellRule();
-        tupleRule();
+        gridTupleRule();
+        rowTupleRule();
+        columnTupleRule();
         //uniqueDigitRule();
       }
 
-//      for (row = 0; row < rows.size(); row++)
-//      {
-//        for (Entry entry : rows.get(row))
-//        {
-//          entry.print();
-//        }
-//      }
+      for (row = 0; row < rows.size(); row++)
+      {
+        for (Entry entry : rows.get(row))
+        {
+          entry.print();
+        }
+      }
 
       if (!validSums())
       {
