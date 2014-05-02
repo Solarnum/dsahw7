@@ -215,6 +215,106 @@ public class Sudoku
         unsetEntries.remove(entry);
       }
     }
+    
+    public void rowCellRule()
+    {
+      int row, column, grid;
+      ArrayList<Entry> finishedEntries = new ArrayList<Entry>();
+
+      for (Entry entry : unsetEntries)
+      {
+        row = entry.row;
+        column = entry.column;
+        grid = entry.grid;
+        ArrayList<Integer> uniqueValues = new ArrayList<Integer>(entry.possibleValues);
+        ArrayList<Integer> nonUnique = new ArrayList<Integer>();
+
+        for (Entry e : rows.get(row))
+        {
+          if (!entry.equals(e))
+          {
+            for (Integer i : uniqueValues)
+            {
+              if (e.possibleValues.contains((Integer) i))
+              {
+                nonUnique.add(i);
+              }
+            }
+          }
+        }
+
+        for (Integer i : nonUnique)
+        {
+          uniqueValues.remove((Integer) i);
+        }
+
+        if (uniqueValues.size() == 1)
+        {
+          rows.get(row).set(rows.get(row).indexOf(entry),
+              new Entry(entry.row, entry.column, uniqueValues.get(0)));
+          columns.get(column).set(columns.get(column).indexOf(entry),
+              new Entry(entry.row, entry.column, uniqueValues.get(0)));
+          grids.get(grid).set(grids.get(grid).indexOf(entry),
+              new Entry(entry.row, entry.column, uniqueValues.get(0)));
+          finishedEntries.add(entry);
+        }
+      }
+
+      for (Entry entry : finishedEntries)
+      {
+        unsetEntries.remove(entry);
+      }
+    }
+    
+    public void columnCellRule()
+    {
+      int row, column, grid;
+      ArrayList<Entry> finishedEntries = new ArrayList<Entry>();
+
+      for (Entry entry : unsetEntries)
+      {
+        row = entry.row;
+        column = entry.column;
+        ArrayList<Integer> uniqueValues = new ArrayList<Integer>(entry.possibleValues);
+        ArrayList<Integer> nonUnique = new ArrayList<Integer>();
+        grid = entry.grid;
+
+        for (Entry e : columns.get(column))
+        {
+          if (!entry.equals(e))
+          {
+            for (Integer i : uniqueValues)
+            {
+              if (e.possibleValues.contains((Integer) i))
+              {
+                nonUnique.add(i);
+              }
+            }
+          }
+        }
+
+        for (Integer i : nonUnique)
+        {
+          uniqueValues.remove((Integer) i);
+        }
+
+        if (uniqueValues.size() == 1)
+        {
+          rows.get(row).set(rows.get(row).indexOf(entry),
+              new Entry(entry.row, entry.column, uniqueValues.get(0)));
+          columns.get(column).set(columns.get(column).indexOf(entry),
+              new Entry(entry.row, entry.column, uniqueValues.get(0)));
+          grids.get(grid).set(grids.get(grid).indexOf(entry),
+              new Entry(entry.row, entry.column, uniqueValues.get(0)));
+          finishedEntries.add(entry);
+        }
+      }
+
+      for (Entry entry : finishedEntries)
+      {
+        unsetEntries.remove(entry);
+      }
+    }
 
     public void tupleRule()
     {
@@ -293,44 +393,45 @@ public class Sudoku
     {
       int row, column, grid;
       ArrayList<Entry> finishedEntries = new ArrayList<Entry>();
-      Hashtable<Integer, ArrayList<Entry>> tupleCandidates;
 
-      for (grid = 0; grid < grids.size(); grid++)
-      {
-        for (int i = 1; i <= 9; i++)
-        {
-          ArrayList<Entry> list = new ArrayList<Entry>();
-          for (Entry entry : grids.get(grid))
-          {
-            if (!entry.isSet() && entry.possibleValues.contains(i))
-            {
-              list.add(entry);
-            }
-          }
-
-          if (list.size() == 1)
-          {
-            Entry entry = list.get(0);
-            rows.get(entry.row).set(rows.get(entry.row).indexOf(entry),
-                new Entry(entry.row, entry.column, i));
-            columns.get(entry.column).set(columns.get(entry.column).indexOf(entry),
-                new Entry(entry.row, entry.column, i));
-            grids.get(entry.grid).set(grids.get(entry.grid).indexOf(entry),
-                new Entry(entry.row, entry.column, i));
-            unsetEntries.remove(entry);
-          }
-        }
-      }
+//      for (grid = 0; grid < grids.size(); grid++)
+//      {
+//        for (int i = 1; i <= 9; i++)
+//        {
+//          ArrayList<Entry> list = new ArrayList<Entry>();
+//          for (Entry entry : grids.get(grid))
+//          {
+//            if (!entry.isSet() && entry.possibleValues.contains(i))
+//            {
+//              list.add(entry);
+//            }
+//          }
+//
+//          if (list.size() == 1)
+//          {
+//            Entry entry = list.get(0);
+//            rows.get(entry.row).set(rows.get(entry.row).indexOf(entry),
+//                new Entry(entry.row, entry.column, i));
+//            columns.get(entry.column).set(columns.get(entry.column).indexOf(entry),
+//                new Entry(entry.row, entry.column, i));
+//            grids.get(entry.grid).set(grids.get(entry.grid).indexOf(entry),
+//                new Entry(entry.row, entry.column, i));
+//            unsetEntries.remove(entry);
+//          }
+//        }
+//      }
 
 //      for (row = 0; row < rows.size(); row++)
 //      {
 //        for (int i = 1; i <= 9; i++)
 //        {
 //          ArrayList<Entry> list = new ArrayList<Entry>();
+//          System.out.println(i +" : ");
 //          for (Entry entry : rows.get(row))
 //          {
 //            if (!entry.isSet() && entry.possibleValues.contains(i))
 //            {
+//              entry.print();
 //              list.add(entry);
 //            }
 //          }
@@ -338,58 +439,68 @@ public class Sudoku
 //          if (list.size() == 1)
 //          {
 //            Entry entry = list.get(0);
-//            rows.get(entry.row).set(rows.get(entry.row).indexOf(entry),
-//                new Entry(entry.row, entry.column, i));
-//            columns.get(entry.column).set(columns.get(entry.column).indexOf(entry),
-//                new Entry(entry.row, entry.column, i));
-//            grids.get(entry.grid).set(grids.get(entry.grid).indexOf(entry),
-//                new Entry(entry.row, entry.column, i));
-//            unsetEntries.remove(entry);
-//          }
-//        }
-//      }
-//      
-//      for (column = 0; column < columns.size(); column++)
-//      {
-//        for (int i = 1; i <= 9; i++)
-//        {
-//          ArrayList<Entry> list = new ArrayList<Entry>();
-//          for (Entry entry : columns.get(column))
-//          {
-//            if (!entry.isSet() && entry.possibleValues.contains(i))
-//            {
-//              list.add(entry);
-//            }
-//          }
+//            Entry e = new Entry(entry.row, entry.column, i);
+//            
+//            //e.print();
 //
-//          if (list.size() == 1)
-//          {
-//            Entry entry = list.get(0);
-//            rows.get(entry.row).set(rows.get(entry.row).indexOf(entry),
-//                new Entry(entry.row, entry.column, i));
-//            columns.get(entry.column).set(columns.get(entry.column).indexOf(entry),
-//                new Entry(entry.row, entry.column, i));
-//            grids.get(entry.grid).set(grids.get(entry.grid).indexOf(entry),
-//                new Entry(entry.row, entry.column, i));
+//            rows.get(e.row).set(rows.get(e.row).indexOf(entry), e);
+//            columns.get(e.column).set(columns.get(e.column).indexOf(entry), e);
+//            grids.get(e.grid).set(grids.get(e.grid).indexOf(entry), e);
 //            unsetEntries.remove(entry);
 //          }
 //        }
 //      }
+      //      
+      //      for (column = 0; column < columns.size(); column++)
+      //      {
+      //        for (int i = 1; i <= 9; i++)
+      //        {
+      //          ArrayList<Entry> list = new ArrayList<Entry>();
+      //          for (Entry entry : columns.get(column))
+      //          {
+      //            if (!entry.isSet() && entry.possibleValues.contains(i))
+      //            {
+      //              list.add(entry);
+      //            }
+      //          }
+      //
+      //          if (list.size() == 1)
+      //          {
+      //            Entry entry = list.get(0);
+      //            rows.get(entry.row).set(rows.get(entry.row).indexOf(entry),
+      //                new Entry(entry.row, entry.column, i));
+      //            columns.get(entry.column).set(columns.get(entry.column).indexOf(entry),
+      //                new Entry(entry.row, entry.column, i));
+      //            grids.get(entry.grid).set(grids.get(entry.grid).indexOf(entry),
+      //                new Entry(entry.row, entry.column, i));
+      //            unsetEntries.remove(entry);
+      //          }
+      //        }
+      //      }
     }
 
     public void solve()
     {
-      int row, column, grid;
-      ArrayList<Entry> finishedEntries = new ArrayList<Entry>();
+      int row;
 
       //while (unsetEntries.size() > 0)
       for (int i = 0; i < 30; i++)
       {
         pencilMarks();
         gridCellRule();
+        rowCellRule();
+        columnCellRule();
         tupleRule();
-        uniqueDigitRule();
+        //uniqueDigitRule();
       }
+
+//      for (row = 0; row < rows.size(); row++)
+//      {
+//        for (Entry entry : rows.get(row))
+//        {
+//          entry.print();
+//        }
+//      }
 
       if (!validSums())
       {
