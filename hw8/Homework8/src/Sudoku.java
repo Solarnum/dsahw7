@@ -77,6 +77,16 @@ public class Sudoku
         }
       }
     }
+
+    public void print()
+    {
+      System.out.print("(" + row + "," + column + ") : ");
+      for (Integer i : possibleValues)
+      {
+        System.out.print(i + ", ");
+      }
+      System.out.println();
+    }
   }
 
   private static class SudokuGame
@@ -111,116 +121,274 @@ public class Sudoku
       }
     }
 
-    public void solve()
+    public void pencilMarks()
     {
       int row, column, grid;
-      int lastSize = 0;
       ArrayList<Entry> finishedEntries = new ArrayList<Entry>();
 
-      while (unsetEntries.size() > 0)
+      for (Entry entry : unsetEntries)
       {
-        if (unsetEntries.size() == lastSize)
+        row = entry.row;
+        column = entry.column;
+        grid = entry.grid;
+
+        if (!entry.isSet())
         {
-          for (Entry entry : unsetEntries)
+          for (Entry e : rows.get(row))
           {
-            row = entry.row;
-            column = entry.column;
-            ArrayList<Integer> uniqueValues = new ArrayList<Integer>(entry.possibleValues);
-            ArrayList<Integer> nonUnique = new ArrayList<Integer>();
-            grid = entry.grid;
-
-            for (Entry e : grids.get(grid))
-            {
-              if (!entry.equals(e))
-              {
-                for (Integer i : uniqueValues)
-                {
-                  if (e.possibleValues.contains((Integer) i))
-                  {
-                    nonUnique.add(i);
-                  }
-                }
-              }
-            }
-
-            for (Integer i : nonUnique)
-            {
-              uniqueValues.remove((Integer) i);
-            }
-
-            //            System.out.print("(" + row + "," + column + ") : ");
-            //            for (Integer i : uniqueValues)
-            //            {
-            //              System.out.print(i + ", ");
-            //            }
-            //            System.out.println();
-
-            if (uniqueValues.size() == 1)
-            {
-              rows.get(row).set(rows.get(row).indexOf(entry),
-                  new Entry(entry.row, entry.column, uniqueValues.get(0)));
-              columns.get(column).set(columns.get(column).indexOf(entry),
-                  new Entry(entry.row, entry.column, uniqueValues.get(0)));
-              grids.get(grid).set(grids.get(grid).indexOf(entry),
-                  new Entry(entry.row, entry.column, uniqueValues.get(0)));
-              finishedEntries.add(entry);
-            }
+            entry.possibleValues.remove((Integer) e.value);
+          }
+          for (Entry e : columns.get(column))
+          {
+            entry.possibleValues.remove((Integer) e.value);
+          }
+          for (Entry e : grids.get(grid))
+          {
+            entry.possibleValues.remove((Integer) e.value);
           }
 
-          for (Entry entry : finishedEntries)
+          if (entry.possibleValues.size() == 1)
           {
-            unsetEntries.remove(entry);
+            rows.get(row).set(rows.get(row).indexOf(entry),
+                new Entry(entry.row, entry.column, entry.possibleValues.get(0)));
+            columns.get(column).set(columns.get(column).indexOf(entry),
+                new Entry(entry.row, entry.column, entry.possibleValues.get(0)));
+            grids.get(grid).set(grids.get(grid).indexOf(entry),
+                new Entry(entry.row, entry.column, entry.possibleValues.get(0)));
+            finishedEntries.add(entry);
           }
-
-          if (unsetEntries.size() == lastSize)
-            break;
-        }
-
-        lastSize = unsetEntries.size();
-        for (Entry entry : unsetEntries)
-        {
-          row = entry.row;
-          column = entry.column;
-          grid = entry.grid;
-
-          if (!entry.isSet())
-          {
-            for (Entry e : rows.get(row))
-            {
-              entry.possibleValues.remove((Integer) e.value);
-            }
-            for (Entry e : columns.get(column))
-            {
-              entry.possibleValues.remove((Integer) e.value);
-            }
-            for (Entry e : grids.get(grid))
-            {
-              entry.possibleValues.remove((Integer) e.value);
-            }
-
-            if (entry.possibleValues.size() == 1)
-            {
-              rows.get(row).set(rows.get(row).indexOf(entry),
-                  new Entry(entry.row, entry.column, entry.possibleValues.get(0)));
-              columns.get(column).set(columns.get(column).indexOf(entry),
-                  new Entry(entry.row, entry.column, entry.possibleValues.get(0)));
-              grids.get(grid).set(grids.get(grid).indexOf(entry),
-                  new Entry(entry.row, entry.column, entry.possibleValues.get(0)));
-              finishedEntries.add(entry);
-            }
-          }
-        }
-
-        for (Entry entry : finishedEntries)
-        {
-          unsetEntries.remove(entry);
         }
       }
 
-      if (unsetEntries.size() != 0)
+      for (Entry entry : finishedEntries)
       {
-        System.out.println("The Sudoku puzzle is not unique. There are multiple answers.");
-        System.out.println();
+        unsetEntries.remove(entry);
+      }
+    }
+
+    public void gridCellRule()
+    {
+      int row, column, grid;
+      ArrayList<Entry> finishedEntries = new ArrayList<Entry>();
+
+      for (Entry entry : unsetEntries)
+      {
+        row = entry.row;
+        column = entry.column;
+        ArrayList<Integer> uniqueValues = new ArrayList<Integer>(entry.possibleValues);
+        ArrayList<Integer> nonUnique = new ArrayList<Integer>();
+        grid = entry.grid;
+
+        for (Entry e : grids.get(grid))
+        {
+          if (!entry.equals(e))
+          {
+            for (Integer i : uniqueValues)
+            {
+              if (e.possibleValues.contains((Integer) i))
+              {
+                nonUnique.add(i);
+              }
+            }
+          }
+        }
+
+        for (Integer i : nonUnique)
+        {
+          uniqueValues.remove((Integer) i);
+        }
+
+        if (uniqueValues.size() == 1)
+        {
+          rows.get(row).set(rows.get(row).indexOf(entry),
+              new Entry(entry.row, entry.column, uniqueValues.get(0)));
+          columns.get(column).set(columns.get(column).indexOf(entry),
+              new Entry(entry.row, entry.column, uniqueValues.get(0)));
+          grids.get(grid).set(grids.get(grid).indexOf(entry),
+              new Entry(entry.row, entry.column, uniqueValues.get(0)));
+          finishedEntries.add(entry);
+        }
+      }
+
+      for (Entry entry : finishedEntries)
+      {
+        unsetEntries.remove(entry);
+      }
+    }
+
+    public void tupleRule()
+    {
+      int row, column, grid;
+      ArrayList<Entry> finishedEntries = new ArrayList<Entry>();
+      ArrayList<Entry> tupleEntries = new ArrayList<Entry>();
+      Hashtable<Integer, ArrayList<Entry>> tupleCandidates;
+
+      for (grid = 0; grid < grids.size(); grid++)
+      {
+        tupleCandidates = new Hashtable<Integer, ArrayList<Entry>>();
+
+        // Check each cell in the grid to find the digits that are present in
+        // exactly 2 cells
+        for (int i = 1; i <= 9; i++)
+        {
+          ArrayList<Entry> list = new ArrayList<Entry>();
+          for (Entry entry : grids.get(grid))
+          {
+            if (entry.possibleValues.contains(i))
+            {
+              list.add(entry);
+            }
+          }
+
+          if (list.size() == 2)
+          {
+            tupleCandidates.put(i, list);
+          }
+        }
+
+        // Find the ywo tuple lists that are the same those two entries 
+        // can have the rest of their possible values remove
+        for (Integer i : tupleCandidates.keySet())
+        {
+          for (Integer i2 : tupleCandidates.keySet())
+          {
+            if (i != i2)
+            {
+              // There will always be two entries in each list
+              if (tupleCandidates.get(i).contains(tupleCandidates.get(i2).get(0))
+                  && tupleCandidates.get(i).contains(tupleCandidates.get(i2).get(1)))
+              {
+                Entry e1 = tupleCandidates.get(i).get(0);
+                Entry e2 = tupleCandidates.get(i).get(1);
+                ArrayList<Integer> tupleValues = new ArrayList<Integer>();
+                tupleValues.add(i);
+                tupleValues.add(i2);
+                e1.possibleValues = tupleValues;
+                e2.possibleValues = tupleValues;
+
+                //e1.print();
+                //e2.print();
+                //System.out.println();
+
+                rows.get(e1.row).set(rows.get(e1.row).indexOf(e1), e1);
+                columns.get(e1.column).set(columns.get(e1.column).indexOf(e1), e1);
+                grids.get(e1.grid).set(grids.get(e1.grid).indexOf(e1), e1);
+
+                rows.get(e2.row).set(rows.get(e2.row).indexOf(e2), e2);
+                columns.get(e2.column).set(columns.get(e2.column).indexOf(e2), e2);
+                grids.get(e2.grid).set(grids.get(e2.grid).indexOf(e2), e2);
+              }
+            }
+          }
+        }
+      }
+
+      for (Entry entry : finishedEntries)
+      {
+        unsetEntries.remove(entry);
+      }
+    }
+
+    public void uniqueDigitRule()
+    {
+      int row, column, grid;
+      ArrayList<Entry> finishedEntries = new ArrayList<Entry>();
+      Hashtable<Integer, ArrayList<Entry>> tupleCandidates;
+
+      for (grid = 0; grid < grids.size(); grid++)
+      {
+        for (int i = 1; i <= 9; i++)
+        {
+          ArrayList<Entry> list = new ArrayList<Entry>();
+          for (Entry entry : grids.get(grid))
+          {
+            if (!entry.isSet() && entry.possibleValues.contains(i))
+            {
+              list.add(entry);
+            }
+          }
+
+          if (list.size() == 1)
+          {
+            Entry entry = list.get(0);
+            rows.get(entry.row).set(rows.get(entry.row).indexOf(entry),
+                new Entry(entry.row, entry.column, i));
+            columns.get(entry.column).set(columns.get(entry.column).indexOf(entry),
+                new Entry(entry.row, entry.column, i));
+            grids.get(entry.grid).set(grids.get(entry.grid).indexOf(entry),
+                new Entry(entry.row, entry.column, i));
+            unsetEntries.remove(entry);
+          }
+        }
+      }
+
+//      for (row = 0; row < rows.size(); row++)
+//      {
+//        for (int i = 1; i <= 9; i++)
+//        {
+//          ArrayList<Entry> list = new ArrayList<Entry>();
+//          for (Entry entry : rows.get(row))
+//          {
+//            if (!entry.isSet() && entry.possibleValues.contains(i))
+//            {
+//              list.add(entry);
+//            }
+//          }
+//
+//          if (list.size() == 1)
+//          {
+//            Entry entry = list.get(0);
+//            rows.get(entry.row).set(rows.get(entry.row).indexOf(entry),
+//                new Entry(entry.row, entry.column, i));
+//            columns.get(entry.column).set(columns.get(entry.column).indexOf(entry),
+//                new Entry(entry.row, entry.column, i));
+//            grids.get(entry.grid).set(grids.get(entry.grid).indexOf(entry),
+//                new Entry(entry.row, entry.column, i));
+//            unsetEntries.remove(entry);
+//          }
+//        }
+//      }
+//      
+//      for (column = 0; column < columns.size(); column++)
+//      {
+//        for (int i = 1; i <= 9; i++)
+//        {
+//          ArrayList<Entry> list = new ArrayList<Entry>();
+//          for (Entry entry : columns.get(column))
+//          {
+//            if (!entry.isSet() && entry.possibleValues.contains(i))
+//            {
+//              list.add(entry);
+//            }
+//          }
+//
+//          if (list.size() == 1)
+//          {
+//            Entry entry = list.get(0);
+//            rows.get(entry.row).set(rows.get(entry.row).indexOf(entry),
+//                new Entry(entry.row, entry.column, i));
+//            columns.get(entry.column).set(columns.get(entry.column).indexOf(entry),
+//                new Entry(entry.row, entry.column, i));
+//            grids.get(entry.grid).set(grids.get(entry.grid).indexOf(entry),
+//                new Entry(entry.row, entry.column, i));
+//            unsetEntries.remove(entry);
+//          }
+//        }
+//      }
+    }
+
+    public void solve()
+    {
+      int row, column, grid;
+      ArrayList<Entry> finishedEntries = new ArrayList<Entry>();
+
+      //while (unsetEntries.size() > 0)
+      for (int i = 0; i < 30; i++)
+      {
+        pencilMarks();
+        gridCellRule();
+        tupleRule();
+        uniqueDigitRule();
       }
 
       if (!validSums())
